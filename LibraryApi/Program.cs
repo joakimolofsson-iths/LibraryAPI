@@ -9,7 +9,11 @@ namespace LibraryApi
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+			var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+			Console.WriteLine($"Current Environment: {environment}");
+			//$env:ASPNETCORE_ENVIRONMENT="Development"
+
+			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
 			builder.Services.AddControllers().AddJsonOptions(options =>
@@ -18,7 +22,7 @@ namespace LibraryApi
 			});
 
 			builder.Services.AddDbContext<LibraryDbContext>(options =>
-	            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+	            options.UseSqlServer(builder.Configuration.GetConnectionString("BooksDb"))
             );
 
 			builder.Services.AddControllers();
@@ -29,13 +33,22 @@ namespace LibraryApi
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            //if (app.Environment.IsDevelopment())
+            //{
+            //    app.UseSwagger();
+            //    app.UseSwaggerUI();
+            //}
 
-            app.UseHttpsRedirection();
+			if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Azure")
+			{
+				app.UseSwagger();
+				app.UseSwaggerUI(c =>
+				{
+					c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+				});
+			}
+
+			app.UseHttpsRedirection();
 
             app.UseAuthorization();
 

@@ -10,9 +10,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LibraryApi.Migrations
 {
-	[DbContext(typeof(LibraryDbContext))]
-    [Migration("20250112180109_InitialCreate")]
-    partial class InitialCreate
+    [DbContext(typeof(LibraryDbContext))]
+    [Migration("20250117075815_AddingBooks")]
+    partial class AddingBooks
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,33 @@ namespace LibraryApi.Migrations
                     b.HasKey("AuthorId");
 
                     b.ToTable("Authors");
+                });
+
+            modelBuilder.Entity("LibraryApi.Models.Book", b =>
+                {
+                    b.Property<int>("BookId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookId"));
+
+                    b.Property<string>("ISBN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("YearPublished")
+                        .HasColumnType("int");
+
+                    b.HasKey("BookId");
+
+                    b.ToTable("Books");
                 });
 #pragma warning restore 612, 618
         }

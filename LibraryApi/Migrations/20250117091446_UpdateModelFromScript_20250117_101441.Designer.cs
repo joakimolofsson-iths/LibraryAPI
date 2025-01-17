@@ -3,6 +3,7 @@ using LibraryApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryApi.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    partial class LibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250117091446_UpdateModelFromScript_20250117_101441")]
+    partial class UpdateModelFromScript_20250117_101441
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,50 +70,6 @@ namespace LibraryApi.Migrations
                     b.HasKey("BookId");
 
                     b.ToTable("Books");
-                });
-
-            modelBuilder.Entity("LibraryApi.Models.BookAuthor", b =>
-                {
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BookId", "AuthorId");
-
-                    b.HasIndex("AuthorId");
-
-                    b.ToTable("BookAuthors");
-                });
-
-            modelBuilder.Entity("LibraryApi.Models.BookAuthor", b =>
-                {
-                    b.HasOne("LibraryApi.Models.Author", "Author")
-                        .WithMany("BookAuthors")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LibraryApi.Models.Book", "Book")
-                        .WithMany("BookAuthors")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Book");
-                });
-
-            modelBuilder.Entity("LibraryApi.Models.Author", b =>
-                {
-                    b.Navigation("BookAuthors");
-                });
-
-            modelBuilder.Entity("LibraryApi.Models.Book", b =>
-                {
-                    b.Navigation("BookAuthors");
                 });
 #pragma warning restore 612, 618
         }
