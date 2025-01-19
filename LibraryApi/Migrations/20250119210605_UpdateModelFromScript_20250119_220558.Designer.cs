@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryApi.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20250119195736_LoanConstraint")]
-    partial class LoanConstraint
+    [Migration("20250119210605_UpdateModelFromScript_20250119_220558")]
+    partial class UpdateModelFromScript_20250119_220558
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -211,6 +211,7 @@ namespace LibraryApi.Migrations
                     b.HasOne("LibraryApi.Models.Member", "Member")
                         .WithMany("Loans")
                         .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("BookCopy");
