@@ -20,15 +20,10 @@ namespace LibraryApi.Controllers
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<BookDisplayAllDTO>>> GetAllBooks()
 		{
-			var books = await _context.Books
-				.Select(b => new BookDisplayAllDTO
-				{
-					BookId = b.BookId,
-					Title = b.Title
-				})
-				.ToListAsync();
+			var books = await _context.Books.ToListAsync();
+			var bookDTOs = books.Select(Mapper.ToBookDisplayAllDTO).ToList();
 
-			return Ok(books);
+			return Ok(bookDTOs);
 		}
 
 		[HttpGet("{id}")]
@@ -45,23 +40,9 @@ namespace LibraryApi.Controllers
 				return NotFound();
 			}
 
-			var bookDTO = new BookDisplayDTO
-			{
-				BookId = book.BookId,
-				Title = book.Title,
-				ISBN = book.ISBN,
-				YearPublished = book.YearPublished,
-				Rating = book.Rating,
-				Copies = book.BookCopies.Count,
-				Authors = book.BookAuthors.Select(ba => new AuthorDisplayDTO
-				{
-					AuthorId = ba.Author.AuthorId,
-					FirstName = ba.Author.FirstName,
-					LastName = ba.Author.LastName
-				}).ToList()				
-			};
+			var bookDisplayDTO = Mapper.ToBookDisplayDTO(book);
 
-			return bookDTO;
+			return bookDisplayDTO;
 		}
 
 		[HttpPost]
@@ -115,7 +96,20 @@ namespace LibraryApi.Controllers
 
 			await _context.SaveChangesAsync();
 
-			return CreatedAtAction(nameof(GetBookById), new { id = book.BookId }, book);
+			var fullBook = await _context.Books
+				.Include(b => b.BookAuthors)
+				.ThenInclude(ba => ba.Author)
+				.Include(b => b.BookCopies)
+				.FirstOrDefaultAsync(b => b.BookId == book.BookId);
+
+			if (fullBook == null)
+			{
+				return NotFound();
+			}
+
+			var bookDisplayDTO = Mapper.ToBookDisplayDTO(fullBook);
+
+			return CreatedAtAction(nameof(GetBookById), new { id = book.BookId }, bookDisplayDTO);
 		}
 
 		[HttpDelete("{id}")]

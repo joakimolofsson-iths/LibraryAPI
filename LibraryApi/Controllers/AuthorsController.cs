@@ -21,16 +21,10 @@ namespace LibraryApi.Controllers
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<AuthorDisplayDTO>>> GetAllAuthors()
 		{
-			var authors = await _context.Authors
-				.Select(a => new AuthorDisplayDTO
-				{
-					AuthorId = a.AuthorId,
-					FirstName = a.FirstName,
-					LastName = a.LastName
-				})
-				.ToListAsync();
+			var authors = await _context.Authors.ToListAsync();
+			var authorDTOs = authors.Select(Mapper.ToAuthorDisplayDTO).ToList();
 
-			return Ok(authors);
+			return Ok(authorDTOs);
 		}
 
 		[HttpGet("{id}")]
@@ -42,14 +36,9 @@ namespace LibraryApi.Controllers
 				return NotFound();
 			}
 
-			var authorDTO = new AuthorDisplayDTO
-			{
-				AuthorId = author.AuthorId,
-				FirstName = author.FirstName,
-				LastName = author.LastName
-			};
+			var authorDisplayDTO = Mapper.ToAuthorDisplayDTO(author);
 
-			return authorDTO;
+			return authorDisplayDTO;
 		}
 
 		[HttpPost]
@@ -64,7 +53,9 @@ namespace LibraryApi.Controllers
 			_context.Authors.Add(author);
 			await _context.SaveChangesAsync();
 
-			return CreatedAtAction(nameof(GetAuthorById), new { id = author.AuthorId }, author); 
+			var authorDisplayDTO = Mapper.ToAuthorDisplayDTO(author);
+
+			return CreatedAtAction(nameof(GetAuthorById), new { id = author.AuthorId }, authorDisplayDTO); 
 		}
 
 		[HttpDelete("{id}")]
