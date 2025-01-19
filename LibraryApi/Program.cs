@@ -15,6 +15,25 @@ namespace LibraryApi
 
 			var builder = WebApplication.CreateBuilder(args);
 
+			builder.Configuration.AddUserSecrets<Program>();
+			var dbPassword = builder.Configuration["AzureDbPassword"];
+			string connectionString;
+
+			// Choose connection string based on environment
+			if (environment == "Development")
+			{
+				connectionString = builder.Configuration.GetConnectionString("BooksDb");
+			}
+			else if (environment == "Azure")
+			{
+				connectionString = builder.Configuration.GetConnectionString("BooksDb")
+					.Replace("*****", dbPassword);
+			}
+			else
+			{
+				throw new Exception("Unknown environment");
+			}
+
 			// Add services to the container.
 			builder.Services.AddControllers().AddJsonOptions(options =>
 			{
@@ -22,8 +41,8 @@ namespace LibraryApi
 			});
 
 			builder.Services.AddDbContext<LibraryDbContext>(options =>
-	            options.UseSqlServer(builder.Configuration.GetConnectionString("BooksDb"))
-            );
+				options.UseSqlServer(connectionString)
+			);
 
 			builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
