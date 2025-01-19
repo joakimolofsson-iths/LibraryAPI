@@ -6,5 +6,6 @@
 		public required string FirstName { get; set; }
 		public required string LastName { get; set; }
 		public string? CardNumber { get; set; }
+		public ICollection<Loan> Loans { get; set; } = new List<Loan>();
 	}
 }

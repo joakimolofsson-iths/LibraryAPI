@@ -15,9 +15,14 @@ namespace LibraryApi.Data
 		public DbSet<BookAuthor> BookAuthors { get; set; }
 		public DbSet<BookCopy> BookCopies { get; set; }
 		public DbSet<Member> Members { get; set; }
+		public DbSet<Loan> Loans { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			modelBuilder.Entity<Book>()
+				.HasIndex(b => b.ISBN)
+				.IsUnique();
+
 			modelBuilder.Entity<BookAuthor>()
 				.HasKey(ba => new { ba.BookId, ba.AuthorId });
 

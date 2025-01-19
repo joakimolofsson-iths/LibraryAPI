@@ -18,24 +18,13 @@ namespace LibraryApi.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<BookDisplayDTO>>> GetAllBooks()
+		public async Task<ActionResult<IEnumerable<BookDisplayAllDTO>>> GetAllBooks()
 		{
 			var books = await _context.Books
-				.Include(b => b.BookAuthors)
-				.ThenInclude(ba => ba.Author)
-				.Select(b => new BookDisplayDTO
+				.Select(b => new BookDisplayAllDTO
 				{
 					BookId = b.BookId,
-					Title = b.Title,
-					ISBN = b.ISBN,
-					YearPublished = b.YearPublished,
-					Rating = b.Rating,
-					Authors = b.BookAuthors.Select(ba => new AuthorDisplayDTO
-					{
-						AuthorId = ba.Author.AuthorId,
-						FirstName = ba.Author.FirstName,
-						LastName = ba.Author.LastName,
-					}).ToList()
+					Title = b.Title
 				})
 				.ToListAsync();
 
@@ -48,6 +37,7 @@ namespace LibraryApi.Controllers
 			var book = await _context.Books
 				.Include(b => b.BookAuthors)
 				.ThenInclude(ba => ba.Author)
+				.Include(b => b.BookCopies)
 				.FirstOrDefaultAsync(b => b.BookId == id);
 
 			if (book == null)
@@ -62,12 +52,13 @@ namespace LibraryApi.Controllers
 				ISBN = book.ISBN,
 				YearPublished = book.YearPublished,
 				Rating = book.Rating,
+				Copies = book.BookCopies.Count,
 				Authors = book.BookAuthors.Select(ba => new AuthorDisplayDTO
 				{
 					AuthorId = ba.Author.AuthorId,
 					FirstName = ba.Author.FirstName,
 					LastName = ba.Author.LastName
-				}).ToList()
+				}).ToList()				
 			};
 
 			return bookDTO;
@@ -86,6 +77,8 @@ namespace LibraryApi.Controllers
 					}
 				}
 			}
+
+			int copies = bookDTO.Copies > 0 ? bookDTO.Copies : 1;
 
 			var book = new Book
 			{
@@ -109,6 +102,15 @@ namespace LibraryApi.Controllers
 					};
 					_context.BookAuthors.Add(bookAuthor);
 				}
+			}
+
+			for (int i = 0; i < copies; i++)
+			{
+				var bookCopy = new BookCopy
+				{
+					BookId = book.BookId
+				};
+				_context.BookCopies.Add(bookCopy);
 			}
 
 			await _context.SaveChangesAsync();

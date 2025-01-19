@@ -7,6 +7,7 @@
 		public required string ISBN { get; set; }
 		public int YearPublished { get; set; }
 		public int Rating { get; set; }
+		public int Copies { get; set; }
 		public List<AuthorDisplayDTO> Authors { get; set; } = new List<AuthorDisplayDTO>();
 	}
 }
