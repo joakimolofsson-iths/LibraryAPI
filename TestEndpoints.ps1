@@ -105,8 +105,8 @@ $httpMethod = "Post"   ### "Get", "Post", "Put", "Delete"
 $endPoint = "$baseUrl/api/Authors"
 
 $json = '{ 
-    "FirstName": "Joakim", 
-    "LastName": "Olofsson" 
+    "FirstName": "Stephen", 
+    "LastName": "King" 
 }'
 
 $response = Invoke-RestMethod -Uri $endPoint -Method $httpMethod -Body $json -ContentType "application/json"

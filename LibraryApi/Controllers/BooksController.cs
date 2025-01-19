@@ -76,6 +76,17 @@ namespace LibraryApi.Controllers
 		[HttpPost]
 		public async Task<ActionResult<Book>> PostBook(BookCreateDTO bookDTO)
 		{
+			if (bookDTO.AuthorIds != null && bookDTO.AuthorIds.Any())
+			{
+				foreach (var authorId in bookDTO.AuthorIds)
+				{
+					if (!_context.Authors.Any(a => a.AuthorId == authorId))
+					{
+						return BadRequest("One or more authors do not exist...");
+					}
+				}
+			}
+
 			var book = new Book
 			{
 				Title = bookDTO.Title,

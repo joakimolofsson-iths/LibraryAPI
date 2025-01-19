@@ -13,6 +13,8 @@ namespace LibraryApi.Data
 		public DbSet<Author> Authors { get; set; }
 		public DbSet<Book> Books { get; set; }
 		public DbSet<BookAuthor> BookAuthors { get; set; }
+		public DbSet<BookCopy> BookCopies { get; set; }
+		public DbSet<Member> Members { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -30,6 +32,10 @@ namespace LibraryApi.Data
 				.WithMany(a => a.BookAuthors)
 				.HasForeignKey(ba => ba.AuthorId)
 				.OnDelete(DeleteBehavior.Cascade);
+
+			modelBuilder.Entity<Member>()
+			   .HasIndex(m => m.CardNumber)
+			   .IsUnique();
 		}
 	}
 }

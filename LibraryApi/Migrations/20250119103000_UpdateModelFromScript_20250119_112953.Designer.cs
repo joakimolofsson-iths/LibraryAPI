@@ -3,6 +3,7 @@ using LibraryApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryApi.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    partial class LibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250119103000_UpdateModelFromScript_20250119_112953")]
+    partial class UpdateModelFromScript_20250119_112953
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,6 +96,7 @@ namespace LibraryApi.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MemberId"));
 
                     b.Property<string>("CardNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FirstName")
@@ -106,8 +110,7 @@ namespace LibraryApi.Migrations
                     b.HasKey("MemberId");
 
                     b.HasIndex("CardNumber")
-                        .IsUnique()
-                        .HasFilter("[CardNumber] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Members");
                 });
