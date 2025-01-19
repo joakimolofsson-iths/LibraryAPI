@@ -18,33 +18,31 @@ namespace LibraryApi.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Loan>>> GetAllLoans()
+		public async Task<ActionResult<IEnumerable<LoanDisplayDTO>>> GetAllLoans()
 		{
 			var loans = await _context.Loans.ToListAsync();
+			var loanDTOs = loans.Select(Mapper.ToLoanDisplayDTO).ToList();
 
-			if (loans == null || !loans.Any())
-			{
-				return NotFound();
-			}
-
-			return Ok(loans);
+			return Ok(loanDTOs);
 		}
 
 		[HttpGet("{id}")]
-		public async Task<ActionResult<Loan>> GetLoan(int id)
+		public async Task<ActionResult<LoanDisplayDTO>> GetLoanById(int id)
 		{
 			var loan = await _context.Loans
-				.Include(bl => bl.BookCopy)
+				.Include(lo => lo.BookCopy)
 				.ThenInclude(bc => bc.Book)
-				.Include(bl => bl.Member)
-				.FirstOrDefaultAsync(bl => bl.LoanId == id);
+				.Include(lo => lo.Member)
+				.FirstOrDefaultAsync(lo => lo.LoanId == id);
 
 			if (loan == null)
 			{
 				return NotFound("Loan not found.");
 			}
 
-			return loan;
+			var loanDisplayDTO = Mapper.ToLoanDisplayDTO(loan);
+
+			return loanDisplayDTO;
 		}
 
 		[HttpPost]
@@ -76,15 +74,28 @@ namespace LibraryApi.Controllers
 			_context.Loans.Add(loan);
 			await _context.SaveChangesAsync();
 
-			return CreatedAtAction(nameof(GetLoan), new { id = loan.LoanId }, loan);
+			var fullLoan = await _context.Loans
+				.Include(lo => lo.BookCopy)
+				.ThenInclude(bc => bc.Book)
+				.Include(lo => lo.Member)
+				.FirstOrDefaultAsync(lo => lo.LoanId == loan.LoanId);
+
+			if (fullLoan == null)
+			{
+				return NotFound();
+			}
+
+			var loanDisplayDTO = Mapper.ToLoanDisplayDTO(fullLoan);
+
+			return CreatedAtAction(nameof(GetLoanById), new { id = loan.LoanId }, loanDisplayDTO);
 		}
 
 		[HttpPut("{id}/return")]
 		public async Task<IActionResult> ReturnLoan(int id, LoanReturnDTO loanDTO)
 		{
 			var loan = await _context.Loans
-				.Include(bl => bl.BookCopy)
-				.FirstOrDefaultAsync(bl => bl.LoanId == id);
+				.Include(lo => lo.BookCopy)
+				.FirstOrDefaultAsync(lo => lo.LoanId == id);
 
 			if (loan == null)
 			{

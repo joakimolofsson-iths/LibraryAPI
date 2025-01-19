@@ -41,6 +41,12 @@ namespace LibraryApi.Data
 			modelBuilder.Entity<Member>()
 			   .HasIndex(m => m.CardNumber)
 			   .IsUnique();
+
+			modelBuilder.Entity<Loan>()
+				.HasOne(l => l.Member)
+				.WithMany(m => m.Loans)
+				.HasForeignKey(l => l.MemberId)
+				.OnDelete(DeleteBehavior.ClientSetNull);
 		}
 	}
 }

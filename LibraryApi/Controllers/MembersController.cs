@@ -18,32 +18,29 @@ namespace LibraryApi.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<MemberDisplayDTO>>> GetAllMembers()
+		public async Task<ActionResult<IEnumerable<MemberDisplayAllDTO>>> GetAllMembers()
 		{
-			var members = await _context.Members
-				.Select(a => new MemberDisplayDTO
-				{
-					MemberId = a.MemberId,
-					FirstName = a.FirstName,
-					LastName = a.LastName,
-					CardNumber = a.CardNumber
-				})
-				.ToListAsync();
+			var members = await _context.Members.ToListAsync();
+			var membersDTOs = members.Select(Mapper.ToMemberDisplayAllDTO).ToList();
 
-			var member = await _context.Members.ToListAsync();
-			return Ok(member);
+			return Ok(membersDTOs);
 		}
 
 		[HttpGet("{id}")]
-		public async Task<ActionResult<Member>> GetMemberById(int id)
+		public async Task<ActionResult<MemberDisplayDTO>> GetMemberById(int id)
 		{
-			var member = await _context.Members.FindAsync(id);
+			var member = await _context.Members
+				.Include(m => m.Loans)
+				.FirstOrDefaultAsync(m => m.MemberId == id);
+
 			if (member == null)
 			{
 				return NotFound();
 			}
 
-			return member;
+			var memberDisplayDTO = Mapper.ToMemberDisplayDTO(member);
+
+			return memberDisplayDTO;
 		}
 
 		[HttpPost]
@@ -64,7 +61,9 @@ namespace LibraryApi.Controllers
 			_context.Entry(member).State = EntityState.Modified;
 			await _context.SaveChangesAsync();
 
-			return CreatedAtAction(nameof(GetMemberById), new { id = member.MemberId }, member);
+			var memberDisplayAllDTO = Mapper.ToMemberDisplayAllDTO(member);
+
+			return CreatedAtAction(nameof(GetMemberById), new { id = member.MemberId }, memberDisplayAllDTO);
 		}
 
 		[HttpDelete("{id}")]

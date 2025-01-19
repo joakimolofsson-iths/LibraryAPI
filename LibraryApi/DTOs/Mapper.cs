@@ -52,5 +52,47 @@ namespace LibraryApi.DTOs
 				OnLoan = bookCopy.OnLoan
 			};
 		}
+
+		public static MemberDisplayAllDTO ToMemberDisplayAllDTO(Member member)
+		{
+			return new MemberDisplayAllDTO
+			{
+				MemberId = member.MemberId,
+				FirstName = member.FirstName,
+				LastName = member.LastName,
+				CardNumber = member.CardNumber
+			};
+		}
+
+		public static MemberDisplayDTO ToMemberDisplayDTO(Member member)
+		{
+			return new MemberDisplayDTO
+			{
+				MemberId = member.MemberId,
+				FirstName = member.FirstName,
+				LastName = member.LastName,
+				CardNumber = member.CardNumber,
+				Loans = member.Loans.Select(lo => new LoanDisplayDTO
+				{
+					LoanId = lo.LoanId,
+					BookCopyId = lo.BookCopyId,
+					MemberId = lo.MemberId,
+					LoanDate = lo.LoanDate,
+					ReturnDate = lo.ReturnDate
+				}).ToList()
+			};
+		}
+
+		public static LoanDisplayDTO ToLoanDisplayDTO(Loan loan)
+		{
+			return new LoanDisplayDTO
+			{
+				LoanId = loan.LoanId,
+				BookCopyId = loan.BookCopyId,
+				MemberId = loan.MemberId,
+				LoanDate = loan.LoanDate,
+				ReturnDate = loan.ReturnDate
+			};
+		}
 	}
 }

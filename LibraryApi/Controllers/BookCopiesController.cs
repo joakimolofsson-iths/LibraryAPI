@@ -4,6 +4,8 @@ using LibraryApi.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static System.Reflection.Metadata.BlobBuilder;
+using System.Net;
 
 namespace LibraryApi.Controllers
 {
@@ -18,16 +20,15 @@ namespace LibraryApi.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<BookCopy>>> GetAllBookCopies()
+		public async Task<ActionResult<IEnumerable<BookCopyDisplayDTO>>> GetAllBookCopies()
 		{
-			var bookCopies = await _context.BookCopies.ToListAsync();
+			var bookCopies = await _context.BookCopies
+				.Include(bc => bc.Book)
+				.ToListAsync();
 
-			if (bookCopies == null || !bookCopies.Any())
-			{
-				return NotFound();
-			}
+			var bookCopiesDTOs = bookCopies.Select(Mapper.ToBookCopyDisplayDTO).ToList();
 
-			return Ok(bookCopies);
+			return Ok(bookCopiesDTOs);
 		}
 	}
 }
