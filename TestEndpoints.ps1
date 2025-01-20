@@ -94,25 +94,125 @@ Read-Host "Press Enter to continue when the server is started..."
 
 ###
 
-### ------------Post a movie
+function Call-RestApi {
+    param (
+        [string]$HttpMethod,
+        [string]$Endpoint,
+        [string]$Body = $null
+    )
+    try {
+        $response = Invoke-RestMethod -Uri $Endpoint -Method $HttpMethod -Body $Body -ContentType "application/json"
+        $response | Format-Table
+    } catch {
+        Write-Host "Error during API call: $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
 
-
+### ------------ Post Authors
 Write-Host "`nCreate an author"
 
-
-$httpMethod = "Post"   ### "Get", "Post", "Put", "Delete"
-
+$httpMethod = "Post"
 $endPoint = "$baseUrl/api/Authors"
-
 $json = '{ 
-    "FirstName": "Stephen", 
-    "LastName": "King" 
+    "firstName": "Stephen", 
+    "lastName": "King" 
 }'
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint -Body $json
 
-$response = Invoke-RestMethod -Uri $endPoint -Method $httpMethod -Body $json -ContentType "application/json"
-$response | Format-Table
+### ------------ Post Books
+Write-Host "`nCreate a book"
 
+$httpMethod = "Post"
+$endPoint = "$baseUrl/api/Books"
+$json = '{ 
+    "title": "The Shining",
+    "isbn": "9780307743657",
+    "yearPublished": 1977,
+    "rating": 10,
+    "copies": 3,
+    "authorIds": [
+        1
+    ]
+}'
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint -Body $json
 
-### ------------ Query Movies from the database
+### ------------ Post Members
+Write-Host "`nCreate a member"
+
+$httpMethod = "Post"
+$endPoint = "$baseUrl/api/Members"
+$json = '{ 
+    "firstName": "Joakim",
+    "lastName": "Olofsson"
+}'
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint -Body $json
+
+### ------------ Get Books
+Write-Host "`nList all books"
+
+$httpMethod = "Get"
+$endPoint = "$baseUrl/api/Books"
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint
+
+### ------------ Get Books ID
+Write-Host "`nGet a specific book"
+
+$bookId = 1
+$httpMethod = "Get"
+$endPoint = "$baseUrl/api/Books/$bookId"
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint
+
+### ------------ Get BookCopies
+Write-Host "`nList all book copies"
+
+$httpMethod = "Get"
+$endPoint = "$baseUrl/api/BookCopies"
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint
+
+### ------------ Post Loans
+Write-Host "`nBorrow a book"
+
+$httpMethod = "Post"
+$endPoint = "$baseUrl/api/Loans"
+$json = '{ 
+    "bookCopyId": 1,
+    "memberId": 1
+}'
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint -Body $json
+
+### ------------ Put Loans Return
+Write-Host "`nReturn a book"
+
+$loanId = 1
+$httpMethod = "Put"
+$endPoint = "$baseUrl/api/Loans/$loanId/return"
+$json = '{}'
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint -Body $json
+
+### ------------ Delete Members
+Write-Host "`nDelete a member"
+
+$memberId = 1
+$httpMethod = "Delete"
+$endPoint = "$baseUrl/api/Members/$memberId"
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint
+
+### ------------ Delete Books
+Write-Host "`nDelete a book"
+
+$bookId = 1
+$httpMethod = "Delete"
+$endPoint = "$baseUrl/api/Books/$bookId"
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint
+
+### ------------ Delete Authors
+Write-Host "`nDelete an author"
+
+$authorId = 1
+$httpMethod = "Delete"
+$endPoint = "$baseUrl/api/Authors/$authorId"
+Call-RestApi -HttpMethod $httpMethod -Endpoint $endPoint
+
+### ------------ Query Author from the database
 # $sqlResult = Invoke-Sqlcmd -ConnectionString $connectionString -Query "Select * FROM Authors"
 # $sqlResult | Format-Table

@@ -66,7 +66,7 @@ namespace LibraryApi.Controllers
 			{
 				BookCopyId = bookCopy.BookCopyId,
 				MemberId = member.MemberId,
-				LoanDate = DateTime.UtcNow,
+				LoanDate = DateTime.Now,
 			};
 
 			bookCopy.OnLoan = true;
@@ -103,13 +103,12 @@ namespace LibraryApi.Controllers
 			}
 
 			loan.BookCopy.OnLoan = false;
-
-			loan.ReturnDate = loanDTO.ReturnDate;
+			loan.ReturnDate = DateTime.Now;
 
 			_context.Loans.Update(loan);
 			await _context.SaveChangesAsync();
 
-			return NoContent();
+			return Ok(new { message = "Book returned successfully...", returnDate = loan.ReturnDate });
 		}
 	}
 }

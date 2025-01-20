@@ -79,7 +79,7 @@ namespace LibraryApi.Controllers
 			_context.Authors.Remove(author);
 			await _context.SaveChangesAsync();
 
-			return NoContent();
+			return Ok(new { message = "Author deleted successfully..." });
 		}
 	}
 }

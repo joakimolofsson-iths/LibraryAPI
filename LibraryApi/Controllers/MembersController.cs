@@ -78,7 +78,7 @@ namespace LibraryApi.Controllers
 			_context.Members.Remove(member);
 			await _context.SaveChangesAsync();
 
-			return NoContent();
+			return Ok(new {message="Member deleted successfully..."});
 		}
 	}
 }

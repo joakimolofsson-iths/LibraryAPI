@@ -124,7 +124,7 @@ namespace LibraryApi.Controllers
 			_context.Books.Remove(book);
 			await _context.SaveChangesAsync();
 
-			return NoContent();
+			return Ok(new { message = "Book deleted successfully..." });
 		}
 	}
 }
